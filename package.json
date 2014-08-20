@@ -15,16 +15,21 @@
     "SQLite"
   ],
   "license": "Talk to the Legal Department",
-  "main": "index.js",
+  "main": "KnexNest.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "jasmine-node spec"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git@github.com:CoursePark/KnexNest.git"
   },
   "dependencies": {
-    "lodash": "2.4.1",
     "q": "1.0.1",
-    "nesthydrationjs": "0.1.1",
+    "nesthydrationjs": "0.1.3",
     "knex": "0.6.22"
   },
-  "devDependencies": {},
+  "devDependencies": {
+    "jasmine-node": "2.0.0-beta4"
+  },
   "author": "Bluedrop Peformance Learning"
 }

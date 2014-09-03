@@ -1,12 +1,10 @@
 'use strict';
 
-var Q, _, Knex, KnexNest, createMockKnexQuery;
+var q = require('q');
+var _ = require('lodash');
+var knexnest = require('../knexnest.js');
 
-Q = require('q');
-_ = require('lodash');
-KnexNest = require('../KnexNest.js');
-
-createMockKnexQuery = function (client, data) {
+var createMockKnexQuery = function (client, data) {
 	return {
 		client: {Raw: {name: client}},
 		_statements: [
@@ -20,7 +18,7 @@ createMockKnexQuery = function (client, data) {
 			]}
 		],
 		then: function (callback) {
-			var deferred = Q.defer();
+			var deferred = q.defer();
 			
 			process.nextTick(function () {
 				callback(data);

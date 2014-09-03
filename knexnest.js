@@ -1,15 +1,13 @@
 'use strict';
 
-var Q, NestHydrationJS, KnexNest;
-
-Q = require('q');
-NestHydrationJS = require('nesthydrationjs');
+var q = require('q');
+var NestHydrationJS = require('nesthydrationjs');
 
 /* expects a knex object and returns a promise */
-KnexNest = function (knexQuery, listOnEmpty) {
+var knexnest = function (knexQuery, listOnEmpty) {
 	var deferred, structPropToColumnMap, columnList, aliasList, renamedMap, uniqueId, renamedColumnList, i, column, alias, prepend, renamed, data;
 	
-	deferred = Q.defer();
+	deferred = q.defer();
 	
 	// structPropToColumnMap will be sorted out properly inside nest of
 	// NestHydration this just indicates if empty should be object or array
@@ -60,10 +58,10 @@ KnexNest = function (knexQuery, listOnEmpty) {
 				//   tableNameOrAlias.columnName AS "alias"
 				alias = column.slice(column.indexOf('"') + 1, -1);
 				
-				if (alias.length > KnexNest.MAX_POSTGRES_COLUMN_NAME_LENGTH) {
+				if (alias.length > knexnest.MAX_POSTGRES_COLUMN_NAME_LENGTH) {
 					// shorten the alias to allowed size
 					prepend = 'col_' + (uniqueId++) + '_';
-					renamed = prepend + alias.substr(-1 * KnexNest.MAX_POSTGRES_COLUMN_NAME_LENGTH + prepend.length);
+					renamed = prepend + alias.substr(-1 * knexnest.MAX_POSTGRES_COLUMN_NAME_LENGTH + prepend.length);
 					// add to mapping used after db executed to reverse this rename
 					renamedMap[alias] = renamed;
 					// replace the original alias with the shortened one
@@ -77,10 +75,10 @@ KnexNest = function (knexQuery, listOnEmpty) {
 				//   tableNameOrAlias.columnName AS alias
 				alias = column.substr(column.lastIndexOf(' ') + 1);
 				
-				if (alias.length > KnexNest.MAX_POSTGRES_COLUMN_NAME_LENGTH) {
+				if (alias.length > knexnest.MAX_POSTGRES_COLUMN_NAME_LENGTH) {
 					// shorten the alias to allowed size
 					prepend = 'col_' + (uniqueId++) + '_';
-					renamed = prepend + alias.substr(-1 * KnexNest.MAX_POSTGRES_COLUMN_NAME_LENGTH + prepend.length);
+					renamed = prepend + alias.substr(-1 * knexnest.MAX_POSTGRES_COLUMN_NAME_LENGTH + prepend.length);
 					// add to mapping used after db executed to reverse this rename
 					renamedMap[alias] = renamed;
 					// replace the original alias with the shortened one
@@ -127,6 +125,6 @@ KnexNest = function (knexQuery, listOnEmpty) {
 	return deferred.promise;
 };
 
-KnexNest.MAX_POSTGRES_COLUMN_NAME_LENGTH = 63;
+knexnest.MAX_POSTGRES_COLUMN_NAME_LENGTH = 63;
 
-module.exports = KnexNest;
+module.exports = knexnest;

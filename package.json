@@ -1,6 +1,6 @@
 {
   "name": "knexnest",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "Given a Knex select object will provide a hyrdated object using promises.",
   "keywords": [
     "Hydration",
@@ -15,7 +15,7 @@
     "SQLite"
   ],
   "license": "Talk to the Legal Department",
-  "main": "KnexNest.js",
+  "main": "knexnest.js",
   "scripts": {
     "test": "jasmine-node spec"
   },

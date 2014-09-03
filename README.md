@@ -4,6 +4,8 @@ KnexNest
 Takes a Knex.js select query object and hydarates a list of nested objects.
 
 ```javascript
+var knexnest = require('knexnest');
+
 knex
 	.select(
 		'c.id    AS _id',
@@ -18,7 +20,7 @@ knex
 	.innerJoin('course_lesson AS cl', 'cl.course_id', 'c.id')
 	.innerJoin('lesson AS l', 'l.id', 'cl.lesson_id')
 ;
-KnexNest(knex).then(function (data) {
+knexnest(knex).then(function (data) {
 	result = data;
 });
 /* result should be like:

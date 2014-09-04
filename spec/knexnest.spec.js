@@ -51,7 +51,7 @@ describe('KnexNest', function () {
 					{_shortName: '3A', col_0_hortGettingLongOkThisQaulifiesAsALongReallyReallyLongName: '3B', _someproperty: '3B'}
 				]);
 				
-				KnexNest(mockKnexQuery).then(function (data) {
+				knexnest(mockKnexQuery).then(function (data) {
 					result = data;
 					done();
 				});
@@ -70,7 +70,7 @@ describe('KnexNest', function () {
 					{_shortName: '3A', _startingShortOkNotSoShortGettingLongOkThisQaulifiesAsALongReallyReallyLongName: '3B', _someproperty: '3B'}
 				]);
 				
-				KnexNest(mockKnexQuery).then(function (data) {
+				knexnest(mockKnexQuery).then(function (data) {
 					result = data;
 					done();
 				});

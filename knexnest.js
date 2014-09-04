@@ -5,8 +5,6 @@ var NestHydrationJS = require('nesthydrationjs');
 
 /* expects a knex object and returns a promise */
 var knexnest = function (knexQuery, listOnEmpty) {
-	var j, column, alias, prepend, renamed, data;
-	
 	var deferred = q.defer();
 	
 	// structPropToColumnMap will be sorted out properly inside nest of
@@ -34,6 +32,8 @@ var knexnest = function (knexQuery, listOnEmpty) {
 		var renamedMap = {};
 		var uniqueId = 0;
 		
+		var column, alias, prepend, renamed, renamedColumn;
+		
 		for (var i = 0; i < knexQuery._statements.length; i++) {
 			if (knexQuery._statements[i].grouping === undefined || knexQuery._statements[i].grouping !== 'columns') {
 				continue;
@@ -45,9 +45,14 @@ var knexnest = function (knexQuery, listOnEmpty) {
 			}
 			
 			// columns statement, use it
-			for (j = 0; j < knexQuery._statements[i].value.length; j++) {
+			for (var j = 0; j < knexQuery._statements[i].value.length; j++) {
+				renamedColumn = null;
+				
 				// each column in the column statement
-				column = knexQuery._statements[i].value[j];
+				column = knexQuery._statements[i].value[j].sql
+					? knexQuery._statements[i].value[j].sql
+					: knexQuery._statements[i].value[j]
+				;
 				
 				if (column.substr(-1) === '"') {
 					// assume the line has the format
@@ -63,7 +68,7 @@ var knexnest = function (knexQuery, listOnEmpty) {
 						// add to mapping used after db executed to reverse this rename
 						renamedMap[alias] = renamed;
 						// replace the original alias with the shortened one
-						knexQuery._statements[i].value[j] = column.substr(0, column.indexOf('"')) + '"' + renamed + '"';
+						renamedColumn = column.substr(0, column.indexOf('"')) + '"' + renamed + '"';
 					}
 					aliasList.push(alias);
 				} else if (column.indexOf(' AS ') !== -1 || column.indexOf(' as ') !== -1) {
@@ -78,7 +83,7 @@ var knexnest = function (knexQuery, listOnEmpty) {
 						// add to mapping used after db executed to reverse this rename
 						renamedMap[alias] = renamed;
 						// replace the original alias with the shortened one
-						knexQuery._statements[i].value[j] = column.substr(0, column.lastIndexOf(' ') + 1) + renamed;
+						renamedColumn = column.substr(0, column.lastIndexOf(' ') + 1) + renamed;
 					}
 					aliasList.push(alias);
 				} else if (column.indexOf('.') !== -1) {
@@ -89,6 +94,14 @@ var knexnest = function (knexQuery, listOnEmpty) {
 					// assume the line has the format
 					//   columnName
 					aliasList.push(column);
+				}
+				
+				if (renamedColumn !== null) {
+					if (knexQuery._statements[i].value[j].sql) {
+						knexQuery._statements[i].value[j].sql = renamedColumn;
+					} else {
+						knexQuery._statements[i].value[j] = renamedColumn;
+					}
 				}
 			}
 		}

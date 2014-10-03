@@ -53,13 +53,14 @@ var knexnest = function (knexQuery, listOnEmpty) {
 					? knexQuery._statements[i].value[j].sql
 					: knexQuery._statements[i].value[j]
 				;
+				column = column.trim();
 				
 				if (column.substr(-1) === '"') {
 					// assume the line has the format
 					//   tableNameOrAlias.columnName  "alias"
 					// or
 					//   tableNameOrAlias.columnName AS "alias"
-					alias = column.slice(column.indexOf('"') + 1, -1);
+					alias = column.slice(column.lastIndexOf('"', column.length - 2) + 1, -1);
 					
 					if (alias.length > knexnest.MAX_POSTGRES_COLUMN_NAME_LENGTH) {
 						// shorten the alias to allowed size

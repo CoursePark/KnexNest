@@ -29,7 +29,7 @@
     "knex": "tgriesser/knex#eec5bdc4f6a7"
   },
   "devDependencies": {
-    "jasmine-node": "2.0.0-beta4"
+    "jasmine-node": "1.14.5"
   },
   "author": "Bluedrop Peformance Learning"
 }

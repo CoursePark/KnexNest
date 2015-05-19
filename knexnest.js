@@ -11,15 +11,12 @@ var knexnest = function (knexQuery, listOnEmpty) {
 	// NestHydration this just indicates if empty should be object or array
 	var structPropToColumnMap = listOnEmpty == true ? true : null;
 	
-	if (knexQuery.client.Raw.name === 'Raw_PG') {
+	if (knexQuery.client.config && knexQuery.client.config.client === 'postgres' || knexQuery.client.Raw.name === 'Raw_PG') {
 		// Postgres limit column name lengths to 63 characters, need to work
 		// around that.
-		// Knex doesn't provide direct useful information about the connection
-		// using the above indirect and brittle technique to determine that
-		// Postgres is being used
 		// Knex also doesn't provide get or set mechanisms for the column
 		// information once received by select method. So the following gets
-		// dirty by reaching in pull out the _statement property, filtering
+		// dirty by reaching in to pull out the _statement property, filtering
 		// it for columns, processes those and puts the new values back in,
 		// wiping out the old columns
 		

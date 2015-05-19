@@ -1,6 +1,6 @@
 {
   "name": "knexnest",
-  "version": "0.2.4",
+  "version": "0.3.0",
   "description": "Given a Knex select object will provide a hyrdated object using promises.",
   "keywords": [
     "Hydration",
@@ -26,7 +26,7 @@
   "dependencies": {
     "q": "1.0.1",
     "nesthydrationjs": "^0.2.3",
-    "knex": "tgriesser/knex#eec5bdc4f6a7"
+    "knex": "0.8.5"
   },
   "devDependencies": {
     "jasmine-node": "1.14.5"

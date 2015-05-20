@@ -4,29 +4,30 @@ var q = require('q');
 var _ = require('lodash');
 var knexnest = require('../knexnest.js');
 
-var createMockKnexQuery = function (client, data) {
+var createMockKnexQuery = function (client, queryType, data) {
 	var expectedClient = client === 'postgres'
 		? {config: {client: 'postgres'}}
 		: {Raw: {name: client}}
 	;
+	var arr = queryType === 'array' && '_' || '';
 	return {
 		client: expectedClient,
 		_statements: [
 			{grouping: 'columns', value: [
-				'something.id AS "_shortName"',
-				'something.someproperty AS "_startingShortOkNotSoShortGettingLongOkThisQaulifiesAsALongReallyReallyLongName"'
+				'something.id AS "' + arr + 'shortName"',
+				'something.someproperty AS "' + arr + 'startingShortOkNotSoShortGettingLongOkThisQaulifiesAsALongReallyReallyLongName"'
 			]},
 			{grouping: 'otherstuff', value: ['should not show up in column list']},
 			{grouping: 'columns', value: [
-				'something.someproperty AS "_someproperty"'
+				'something.someproperty AS "' + arr + 'someproperty"'
 			]},
 			{grouping: 'columns', value: [
-				'something.id AS _anotherShortName',
-				'something.someproperty AS _anotherStartingShortOkNotSoShortGettingLongOkThisQaulifiesAsALongReallyReallyLongName'
+				'something.id AS ' + arr + 'anotherShortName',
+				'something.someproperty AS ' + arr + 'anotherStartingShortOkNotSoShortGettingLongOkThisQaulifiesAsALongReallyReallyLongName'
 			]},
 			{grouping: 'columns', value: [
-				'"something".otherProperty AS "_quotesEverywhere"',
-				'"something".whatProperty AS _quotesThereButNotHere'
+				'"something".otherProperty AS "' + arr + 'quotesEverywhere"',
+				'"something".whatProperty AS ' + arr + 'quotesThereButNotHere'
 			]}
 		],
 		then: function (callback) {
@@ -44,71 +45,134 @@ var createMockKnexQuery = function (client, data) {
 };
 
 describe('KnexNest', function () {
-	var mockKnexQuery, sampleTabluarData, result, expected;
+	var result, error;
 	
-	describe('columnNameComplianceMapping', function () {
-		beforeEach(function () {
-			expected = [
+	var scenarioList = [
+		{
+			describe: 'column name compliance for postgres connection and knex < 0.8.0',
+			mockKnexQuery: createMockKnexQuery('Raw_PG', 'array', [
+				{_shortName: '1A', col_0_hortGettingLongOkThisQaulifiesAsALongReallyReallyLongName: '1B', _someproperty: '1C', _anotherShortName: '1D', col_1_hortGettingLongOkThisQaulifiesAsALongReallyReallyLongName: '1E', _quotesEverywhere: '1F', _quotesThereButNotHere: '1G'}
+			]),
+			listOnEmpty: undefined,
+			it: 'should map the column names',
+			expectResult: [
 				{shortName: '1A', startingShortOkNotSoShortGettingLongOkThisQaulifiesAsALongReallyReallyLongName: '1B', someproperty: '1C', anotherShortName: '1D', anotherStartingShortOkNotSoShortGettingLongOkThisQaulifiesAsALongReallyReallyLongName: '1E', quotesEverywhere: '1F', quotesThereButNotHere: '1G'},
-				{shortName: '2A', startingShortOkNotSoShortGettingLongOkThisQaulifiesAsALongReallyReallyLongName: '2B', someproperty: '2C', anotherShortName: '2D', anotherStartingShortOkNotSoShortGettingLongOkThisQaulifiesAsALongReallyReallyLongName: '2E', quotesEverywhere: '2F', quotesThereButNotHere: '2G'},
-				{shortName: '3A', startingShortOkNotSoShortGettingLongOkThisQaulifiesAsALongReallyReallyLongName: '3B', someproperty: '3C', anotherShortName: '3D', anotherStartingShortOkNotSoShortGettingLongOkThisQaulifiesAsALongReallyReallyLongName: '3E', quotesEverywhere: '3F', quotesThereButNotHere: '3G'}
-			];
-		});
-		
-		describe('Postgres, knex < 0.8.0', function () {
+			],
+			expectError: null
+		},
+		{
+			describe: 'column name compliance for postgres connection and knex >= 0.8.0',
+			mockKnexQuery: createMockKnexQuery('postgres', 'array', [
+				{_shortName: '1A', col_0_hortGettingLongOkThisQaulifiesAsALongReallyReallyLongName: '1B', _someproperty: '1C', _anotherShortName: '1D', col_1_hortGettingLongOkThisQaulifiesAsALongReallyReallyLongName: '1E', _quotesEverywhere: '1F', _quotesThereButNotHere: '1G'}
+			]),
+			listOnEmpty: undefined,
+			it: 'should map the column names',
+			expectResult: [
+				{shortName: '1A', startingShortOkNotSoShortGettingLongOkThisQaulifiesAsALongReallyReallyLongName: '1B', someproperty: '1C', anotherShortName: '1D', anotherStartingShortOkNotSoShortGettingLongOkThisQaulifiesAsALongReallyReallyLongName: '1E', quotesEverywhere: '1F', quotesThereButNotHere: '1G'}
+			],
+			expectError: null
+		},
+		{
+			describe: 'column name compliance for non-postgres connection',
+			mockKnexQuery: createMockKnexQuery('Raw', 'array', [
+				{_shortName: '1A', _startingShortOkNotSoShortGettingLongOkThisQaulifiesAsALongReallyReallyLongName: '1B', _someproperty: '1C', _anotherShortName: '1D', _anotherStartingShortOkNotSoShortGettingLongOkThisQaulifiesAsALongReallyReallyLongName: '1E', _quotesEverywhere: '1F', _quotesThereButNotHere: '1G'}
+			]),
+			listOnEmpty: undefined,
+			it: 'should map the column names',
+			expectResult: [
+				{shortName: '1A', startingShortOkNotSoShortGettingLongOkThisQaulifiesAsALongReallyReallyLongName: '1B', someproperty: '1C', anotherShortName: '1D', anotherStartingShortOkNotSoShortGettingLongOkThisQaulifiesAsALongReallyReallyLongName: '1E', quotesEverywhere: '1F', quotesThereButNotHere: '1G'}
+			],
+			expectError: null
+		},
+		{
+			describe: 'array query with empty result and no listOnEmpty hint for postgres connection',
+			mockKnexQuery: createMockKnexQuery('postgres', 'array', []),
+			listOnEmpty: undefined,
+			it: 'should return an empty array',
+			expectResult: [],
+			expectError: null
+		},
+		{
+			describe: 'array query with empty result and listOnEmpty hint for postgres connection',
+			mockKnexQuery: createMockKnexQuery('postgres', 'array', []),
+			listOnEmpty: true,
+			it: 'should return an empty array',
+			expectResult: [],
+			expectError: null
+		},
+		{
+			describe: 'array query with empty result and no listOnEmpty hint for non-postgres connection',
+			mockKnexQuery: createMockKnexQuery('Raw', 'array', []),
+			listOnEmpty: undefined,
+			it: 'should return null',
+			expectResult: null,
+			expectError: null
+		},
+		{
+			describe: 'array query with empty result and listOnEmpty hint for non-postgres connection',
+			mockKnexQuery: createMockKnexQuery('Raw', 'array', []),
+			listOnEmpty: true,
+			it: 'should return empty array',
+			expectResult: [],
+			expectError: null
+		},
+		{
+			describe: 'object query with empty result and no listOnEmpty hint for postgres connection',
+			mockKnexQuery: createMockKnexQuery('postgres', 'object', []),
+			listOnEmpty: undefined,
+			it: 'should return an empty array',
+			expectResult: null,
+			expectError: null
+		},
+		{
+			describe: 'object query with empty result and listOnEmpty hint for postgres connection',
+			mockKnexQuery: createMockKnexQuery('postgres', 'object', []),
+			listOnEmpty: true,
+			it: 'should throw error',
+			expectResult: null,
+			expectError: 'listOnEmpty param conflicts with query which specifies a object or null result'
+		},
+		{
+			describe: 'object query with empty result and no listOnEmpty hint for non-postgres connection',
+			mockKnexQuery: createMockKnexQuery('Raw', 'object', []),
+			listOnEmpty: undefined,
+			it: 'should return null',
+			expectResult: null,
+			expectError: null
+		},
+		{
+			describe: 'object query with empty result and listOnEmpty hint for non-postgres connection',
+			mockKnexQuery: createMockKnexQuery('Raw', 'object', []),
+			listOnEmpty: true,
+			it: 'should return an empty array',
+			expectResult: [],
+			expectError: null
+		}
+	];
+	
+	_.each(scenarioList, function (scenario) {
+		describe(scenario.describe, function () {
 			beforeEach(function (done) {
-				mockKnexQuery = createMockKnexQuery('Raw_PG', [
-					{_shortName: '1A', col_0_hortGettingLongOkThisQaulifiesAsALongReallyReallyLongName: '1B', _someproperty: '1C', _anotherShortName: '1D', col_1_hortGettingLongOkThisQaulifiesAsALongReallyReallyLongName: '1E', _quotesEverywhere: '1F', _quotesThereButNotHere: '1G'},
-					{_shortName: '2A', col_0_hortGettingLongOkThisQaulifiesAsALongReallyReallyLongName: '2B', _someproperty: '2C', _anotherShortName: '2D', col_1_hortGettingLongOkThisQaulifiesAsALongReallyReallyLongName: '2E', _quotesEverywhere: '2F', _quotesThereButNotHere: '2G'},
-					{_shortName: '3A', col_0_hortGettingLongOkThisQaulifiesAsALongReallyReallyLongName: '3B', _someproperty: '3C', _anotherShortName: '3D', col_1_hortGettingLongOkThisQaulifiesAsALongReallyReallyLongName: '3E', _quotesEverywhere: '3F', _quotesThereButNotHere: '3G'}
-				]);
+				result = error = undefined;
 				
-				knexnest(mockKnexQuery).then(function (data) {
-					result = data;
-					done();
-				});
+				knexnest(scenario.mockKnexQuery, scenario.listOnEmpty)
+					.then(function (data) {
+						result = data;
+						done();
+					})
+					.catch(function (err) {
+						error = err;
+						done();
+					})
+				;
 			});
 			
-			it('should change the column names', function () {
-				expect(result).toEqual(expected);
-			});
-		});
-		
-		describe('Postgres, knex >= 0.8.0', function () {
-			beforeEach(function (done) {
-				mockKnexQuery = createMockKnexQuery('postgres', [
-					{_shortName: '1A', col_0_hortGettingLongOkThisQaulifiesAsALongReallyReallyLongName: '1B', _someproperty: '1C', _anotherShortName: '1D', col_1_hortGettingLongOkThisQaulifiesAsALongReallyReallyLongName: '1E', _quotesEverywhere: '1F', _quotesThereButNotHere: '1G'},
-					{_shortName: '2A', col_0_hortGettingLongOkThisQaulifiesAsALongReallyReallyLongName: '2B', _someproperty: '2C', _anotherShortName: '2D', col_1_hortGettingLongOkThisQaulifiesAsALongReallyReallyLongName: '2E', _quotesEverywhere: '2F', _quotesThereButNotHere: '2G'},
-					{_shortName: '3A', col_0_hortGettingLongOkThisQaulifiesAsALongReallyReallyLongName: '3B', _someproperty: '3C', _anotherShortName: '3D', col_1_hortGettingLongOkThisQaulifiesAsALongReallyReallyLongName: '3E', _quotesEverywhere: '3F', _quotesThereButNotHere: '3G'}
-				]);
-				
-				knexnest(mockKnexQuery).then(function (data) {
-					result = data;
-					done();
-				});
-			});
-			
-			it('should change the column names', function () {
-				expect(result).toEqual(expected);
-			});
-		});
-		
-		describe('Non Postgres', function () {
-			beforeEach(function (done) {
-				mockKnexQuery = createMockKnexQuery('Raw', [
-					{_shortName: '1A', _startingShortOkNotSoShortGettingLongOkThisQaulifiesAsALongReallyReallyLongName: '1B', _someproperty: '1C', _anotherShortName: '1D', _anotherStartingShortOkNotSoShortGettingLongOkThisQaulifiesAsALongReallyReallyLongName: '1E', _quotesEverywhere: '1F', _quotesThereButNotHere: '1G'},
-					{_shortName: '2A', _startingShortOkNotSoShortGettingLongOkThisQaulifiesAsALongReallyReallyLongName: '2B', _someproperty: '2C', _anotherShortName: '2D', _anotherStartingShortOkNotSoShortGettingLongOkThisQaulifiesAsALongReallyReallyLongName: '2E', _quotesEverywhere: '2F', _quotesThereButNotHere: '2G'},
-					{_shortName: '3A', _startingShortOkNotSoShortGettingLongOkThisQaulifiesAsALongReallyReallyLongName: '3B', _someproperty: '3C', _anotherShortName: '3D', _anotherStartingShortOkNotSoShortGettingLongOkThisQaulifiesAsALongReallyReallyLongName: '3E', _quotesEverywhere: '3F', _quotesThereButNotHere: '3G'}
-				]);
-				
-				knexnest(mockKnexQuery).then(function (data) {
-					result = data;
-					done();
-				});
-			});
-			
-			it('should change the column names', function () {
-				expect(result).toEqual(expected);
+			it(scenario.it, function () {
+				if (scenario.expectError) {
+					expect(error).toEqual(scenario.expectError);
+				} else {
+					expect(result).toEqual(scenario.expectResult);
+				}
 			});
 		});
 	});

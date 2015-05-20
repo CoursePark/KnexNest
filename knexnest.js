@@ -9,7 +9,7 @@ var knexnest = function (knexQuery, listOnEmpty) {
 	
 	// structPropToColumnMap will be sorted out properly inside nest of
 	// NestHydration this just indicates if empty should be object or array
-	var structPropToColumnMap = listOnEmpty == true ? true : null;
+	var structPropToColumnMap = null;
 	
 	if (knexQuery.client.config && knexQuery.client.config.client === 'postgres' || knexQuery.client.Raw.name === 'Raw_PG') {
 		// Postgres limit column name lengths to 63 characters, need to work
@@ -106,6 +106,14 @@ var knexnest = function (knexQuery, listOnEmpty) {
 		
 		// manually specify the propertyMapping based on the aliases determined in rename process
 		structPropToColumnMap = NestHydrationJS.structPropToColumnMapFromColumnHints(aliasList, renamedMap);
+		
+		if (!(structPropToColumnMap instanceof Array) && listOnEmpty) {
+			return q.reject('listOnEmpty param conflicts with query which specifies a object or null result');
+		}
+	}
+	
+	if (structPropToColumnMap === null && listOnEmpty) {
+		structPropToColumnMap = true;
 	}
 	
 	knexQuery

@@ -50,7 +50,7 @@ var knexnest = function (knexQuery, listOnEmpty) {
 				
 				if (column.substr(-1) === '"') {
 					// assume the line has the format
-					//   tableNameOrAlias.columnName  "alias"
+					//   tableNameOrAlias.columnName "alias"
 					// or
 					//   tableNameOrAlias.columnName AS "alias"
 					alias = column.slice(column.lastIndexOf('"', column.length - 2) + 1, -1);

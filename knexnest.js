@@ -5,8 +5,6 @@ var NestHydrationJS = require('nesthydrationjs');
 
 /* expects a knex object and returns a promise */
 var knexnest = function (knexQuery, listOnEmpty) {
-	var deferred = q.defer();
-	
 	// structPropToColumnMap will be sorted out properly inside nest of
 	// NestHydration this just indicates if empty should be object or array
 	var structPropToColumnMap = null;
@@ -21,8 +19,7 @@ var knexnest = function (knexQuery, listOnEmpty) {
 		// wiping out the old columns
 		
 		if (knexQuery._statements === undefined) {
-			deferred.reject('knex query object not structured as expected for KnexNest: does not have _statements property');
-			return deferred.promise;
+			return q.reject('knex query object not structured as expected for KnexNest: does not have _statements property');
 		}
 		
 		var aliasList = [];
@@ -37,8 +34,7 @@ var knexnest = function (knexQuery, listOnEmpty) {
 			}
 			
 			if (knexQuery._statements[i].value === undefined) {
-				deferred.reject('knex query object not structured as expected for KnexNest: _statements item with column grouping does not have value property');
-				return deferred.promise;
+				return q.reject('knex query object not structured as expected for KnexNest: _statements item with column grouping does not have value property');
 			}
 			
 			// columns statement, use it
@@ -116,16 +112,11 @@ var knexnest = function (knexQuery, listOnEmpty) {
 		structPropToColumnMap = true;
 	}
 	
-	knexQuery
+	return knexQuery
 		.then(function (data) {
-			deferred.resolve(NestHydrationJS.nest(data, structPropToColumnMap));
-		})
-		.catch(function (err) {
-			deferred.reject(err);
+			return NestHydrationJS.nest(data, structPropToColumnMap);
 		})
 	;
-	
-	return deferred.promise;
 };
 
 knexnest.MAX_POSTGRES_COLUMN_NAME_LENGTH = 63;

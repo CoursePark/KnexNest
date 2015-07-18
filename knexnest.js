@@ -32,7 +32,7 @@ var knexnest = function (knexQuery, listOnEmpty) {
 		var column, alias, prepend, renamed, renamedColumn;
 		
 		for (var i = 0; i < knexQuery._statements.length; i++) {
-			if (knexQuery._statements[i].grouping === undefined || knexQuery._statements[i].grouping !== 'columns') {
+			if (knexQuery._statements[i].grouping !== 'columns') {
 				continue;
 			}
 			

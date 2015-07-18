@@ -65,7 +65,7 @@ var knexnest = function (knexQuery, listOnEmpty) {
 						renamedColumn = column.substr(0, column.indexOf('"')) + '"' + renamed + '"';
 					}
 					aliasList.push(alias);
-				} else if (column.indexOf(' AS ') !== -1 || column.indexOf(' as ') !== -1) {
+				} else if (column.toLowerCase().indexOf(' as ') !== -1) {
 					// assume the line has the format
 					//   tableNameOrAlias.columnName AS alias
 					alias = column.substr(column.lastIndexOf(' ') + 1);

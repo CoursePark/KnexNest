@@ -15,7 +15,7 @@ var createMockKnexQuery = function (client, queryType, data) {
 		_statements: [
 			{grouping: 'columns', value: [
 				'something.id AS "' + arr + 'shortName"',
-				'something.someproperty AS "' + arr + 'startingShortOkNotSoShortGettingLongOkThisQaulifiesAsALongReallyReallyLongName"'
+				'something.someproperty AS "' + arr + 'startingShortOkNotSoShortGettingLongOkThisQualifiesAsALongReallyReallyLongName"'
 			]},
 			{grouping: 'otherstuff', value: ['should not show up in column list']},
 			{grouping: 'columns', value: [
@@ -23,11 +23,17 @@ var createMockKnexQuery = function (client, queryType, data) {
 			]},
 			{grouping: 'columns', value: [
 				'something.id AS ' + arr + 'anotherShortName',
-				'something.someproperty AS ' + arr + 'anotherStartingShortOkNotSoShortGettingLongOkThisQaulifiesAsALongReallyReallyLongName'
+				'something.someproperty AS ' + arr + 'anotherStartingShortOkNotSoShortGettingLongOkThisQualifiesAsALongReallyReallyLongName'
 			]},
 			{grouping: 'columns', value: [
 				'"something".otherProperty AS "' + arr + 'quotesEverywhere"',
 				'"something".whatProperty AS ' + arr + 'quotesThereButNotHere'
+			]},
+			{grouping: 'columns', value: [
+				'something.someproperty AS ' + arr + 'aliasAfterAS',
+				'something.someproperty As ' + arr + 'aliasAfterAs',
+				'something.someproperty aS ' + arr + 'aliasAfteraS',
+				'something.someproperty as ' + arr + 'aliasAfteras'
 			]}
 		],
 		then: function (callback) {
@@ -47,41 +53,69 @@ var createMockKnexQuery = function (client, queryType, data) {
 describe('KnexNest', function () {
 	var result, error;
 	
+	var fullDataSetFromPostgres = [{
+		_shortName: '1A',
+		col_0_hortGettingLongOkThisQualifiesAsALongReallyReallyLongName: '1B',
+		_someproperty: '1C',
+		_anotherShortName: '1D',
+		col_1_hortGettingLongOkThisQualifiesAsALongReallyReallyLongName: '1E',
+		_quotesEverywhere: '1F',
+		_quotesThereButNotHere: '1G',
+		_aliasAfterAS: '1H',
+		_aliasAfterAs: '1I',
+		_aliasAfteraS: '1J',
+		_aliasAfteras: '1K'
+	}];
+	var fullDataSetFromNonPostgres = [{
+		_shortName: '1A',
+		_startingShortOkNotSoShortGettingLongOkThisQualifiesAsALongReallyReallyLongName: '1B',
+		_someproperty: '1C',
+		_anotherShortName: '1D',
+		_anotherStartingShortOkNotSoShortGettingLongOkThisQualifiesAsALongReallyReallyLongName: '1E',
+		_quotesEverywhere: '1F',
+		_quotesThereButNotHere: '1G',
+		_aliasAfterAS: '1H',
+		_aliasAfterAs: '1I',
+		_aliasAfteraS: '1J',
+		_aliasAfteras: '1K'
+	}];
+	var expectedFullDataResult = [{
+		shortName: '1A',
+		startingShortOkNotSoShortGettingLongOkThisQualifiesAsALongReallyReallyLongName: '1B',
+		someproperty: '1C',
+		anotherShortName: '1D',
+		anotherStartingShortOkNotSoShortGettingLongOkThisQualifiesAsALongReallyReallyLongName: '1E',
+		quotesEverywhere: '1F',
+		quotesThereButNotHere: '1G',
+		aliasAfterAS: '1H',
+		aliasAfterAs: '1I',
+		aliasAfteraS: '1J',
+		aliasAfteras: '1K'
+	}];
+	
 	var scenarioList = [
 		{
 			describe: 'column name compliance for postgres connection and knex < 0.8.0',
-			mockKnexQuery: createMockKnexQuery('Raw_PG', 'array', [
-				{_shortName: '1A', col_0_hortGettingLongOkThisQaulifiesAsALongReallyReallyLongName: '1B', _someproperty: '1C', _anotherShortName: '1D', col_1_hortGettingLongOkThisQaulifiesAsALongReallyReallyLongName: '1E', _quotesEverywhere: '1F', _quotesThereButNotHere: '1G'}
-			]),
+			mockKnexQuery: createMockKnexQuery('Raw_PG', 'array', fullDataSetFromPostgres),
 			listOnEmpty: undefined,
 			it: 'should map the column names',
-			expectResult: [
-				{shortName: '1A', startingShortOkNotSoShortGettingLongOkThisQaulifiesAsALongReallyReallyLongName: '1B', someproperty: '1C', anotherShortName: '1D', anotherStartingShortOkNotSoShortGettingLongOkThisQaulifiesAsALongReallyReallyLongName: '1E', quotesEverywhere: '1F', quotesThereButNotHere: '1G'},
-			],
+			expectResult: expectedFullDataResult,
 			expectError: null
 		},
 		{
 			describe: 'column name compliance for postgres connection and knex >= 0.8.0',
-			mockKnexQuery: createMockKnexQuery('postgres', 'array', [
-				{_shortName: '1A', col_0_hortGettingLongOkThisQaulifiesAsALongReallyReallyLongName: '1B', _someproperty: '1C', _anotherShortName: '1D', col_1_hortGettingLongOkThisQaulifiesAsALongReallyReallyLongName: '1E', _quotesEverywhere: '1F', _quotesThereButNotHere: '1G'}
-			]),
+			mockKnexQuery: createMockKnexQuery('postgres', 'array', fullDataSetFromPostgres),
 			listOnEmpty: undefined,
 			it: 'should map the column names',
-			expectResult: [
-				{shortName: '1A', startingShortOkNotSoShortGettingLongOkThisQaulifiesAsALongReallyReallyLongName: '1B', someproperty: '1C', anotherShortName: '1D', anotherStartingShortOkNotSoShortGettingLongOkThisQaulifiesAsALongReallyReallyLongName: '1E', quotesEverywhere: '1F', quotesThereButNotHere: '1G'}
-			],
+			expectResult: expectedFullDataResult,
 			expectError: null
 		},
 		{
 			describe: 'column name compliance for non-postgres connection',
-			mockKnexQuery: createMockKnexQuery('Raw', 'array', [
-				{_shortName: '1A', _startingShortOkNotSoShortGettingLongOkThisQaulifiesAsALongReallyReallyLongName: '1B', _someproperty: '1C', _anotherShortName: '1D', _anotherStartingShortOkNotSoShortGettingLongOkThisQaulifiesAsALongReallyReallyLongName: '1E', _quotesEverywhere: '1F', _quotesThereButNotHere: '1G'}
-			]),
+			mockKnexQuery: createMockKnexQuery('Raw', 'array', fullDataSetFromNonPostgres),
 			listOnEmpty: undefined,
 			it: 'should map the column names',
-			expectResult: [
-				{shortName: '1A', startingShortOkNotSoShortGettingLongOkThisQaulifiesAsALongReallyReallyLongName: '1B', someproperty: '1C', anotherShortName: '1D', anotherStartingShortOkNotSoShortGettingLongOkThisQaulifiesAsALongReallyReallyLongName: '1E', quotesEverywhere: '1F', quotesThereButNotHere: '1G'}
-			],
+			expectResult: expectedFullDataResult,
 			expectError: null
 		},
 		{

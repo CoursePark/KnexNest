@@ -40,7 +40,7 @@ var createMockKnexQuery = function (client, queryType, data) {
 			var deferred = q.defer();
 			
 			process.nextTick(function () {
-				callback(data);
+				deferred.resolve(callback(data));
 			});
 			
 			return deferred.promise;

@@ -1,6 +1,6 @@
 'use strict';
 
-var q = require('q');
+var when = require('when');
 var NestHydrationJS = require('nesthydrationjs');
 
 /* expects a knex object and returns a promise */
@@ -19,7 +19,7 @@ var knexnest = function (knexQuery, listOnEmpty) {
 		// wiping out the old columns
 		
 		if (knexQuery._statements === undefined) {
-			return q.reject('knex query object not structured as expected for KnexNest: does not have _statements property');
+			return when.reject('knex query object not structured as expected for KnexNest: does not have _statements property');
 		}
 		
 		var aliasList = [];
@@ -34,7 +34,7 @@ var knexnest = function (knexQuery, listOnEmpty) {
 			}
 			
 			if (knexQuery._statements[i].value === undefined) {
-				return q.reject('knex query object not structured as expected for KnexNest: _statements item with column grouping does not have value property');
+				return when.reject('knex query object not structured as expected for KnexNest: _statements item with column grouping does not have value property');
 			}
 			
 			// columns statement, use it
@@ -104,7 +104,7 @@ var knexnest = function (knexQuery, listOnEmpty) {
 		structPropToColumnMap = NestHydrationJS.structPropToColumnMapFromColumnHints(aliasList, renamedMap);
 		
 		if (!(structPropToColumnMap instanceof Array) && listOnEmpty) {
-			return q.reject('listOnEmpty param conflicts with query which specifies a object or null result');
+			return when.reject('listOnEmpty param conflicts with query which specifies a object or null result');
 		}
 	}
 	

@@ -1,6 +1,6 @@
 'use strict';
 
-var q = require('q');
+var when = require('when');
 var _ = require('lodash');
 var knexnest = require('../knexnest.js');
 
@@ -37,7 +37,7 @@ var createMockKnexQuery = function (client, queryType, data) {
 			]}
 		],
 		then: function (callback) {
-			var deferred = q.defer();
+			var deferred = when.defer();
 			
 			process.nextTick(function () {
 				deferred.resolve(callback(data));

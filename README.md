@@ -1,5 +1,7 @@
 KnexNest
 ========
+[![Build Status](https://travis-ci.org/CoursePark/KnexNest.svg?branch=master)](https://travis-ci.org/CoursePark/KnexNest)
+[![Coverage Status](https://coveralls.io/repos/CoursePark/KnexNest/badge.svg?branch=master&service=github)](https://coveralls.io/github/CoursePark/KnexNest?branch=master)
 
 Takes a Knex.js select query object and hydarates a list of nested objects.
 

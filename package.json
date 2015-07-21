@@ -17,7 +17,8 @@
   "license": "Talk to the Legal Department",
   "main": "knexnest.js",
   "scripts": {
-    "coverage": "node_modules/istanbul/lib/cli.js cover node_modules/jasmine/bin/jasmine.js && cat ./coverage/lcov.info | ./node_modules/coveralls/bin/coveralls.js",
+    "coverage": "node_modules/istanbul/lib/cli.js cover node_modules/jasmine/bin/jasmine.js",
+    "coveralls": "node_modules/istanbul/lib/cli.js cover node_modules/jasmine/bin/jasmine.js && cat ./coverage/lcov.info | ./node_modules/coveralls/bin/coveralls.js",
     "test": "node_modules/jasmine/bin/jasmine.js"
   },
   "repository": {

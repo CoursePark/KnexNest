@@ -1,6 +1,6 @@
 {
   "name": "knexnest",
-  "version": "0.3.3",
+  "version": "0.3.4",
   "description": "Given a Knex select object will provide a hyrdated object using promises.",
   "keywords": [
     "Hydration",

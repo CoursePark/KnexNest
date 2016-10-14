@@ -1,6 +1,5 @@
 'use strict';
 
-var when = require('when');
 var _ = require('lodash');
 var knexnest = require('../knexnest.js');
 
@@ -9,7 +8,7 @@ var createMockKnexQuery = function (client, queryType, data) {
 		? {config: {client: 'postgres'}}
 		: {Raw: {name: client}}
 	;
-	var arr = queryType === 'array' && '_' || '';
+	var arr = queryType === 'array' ? '_' : '';
 	return {
 		client: expectedClient,
 		_statements: [
@@ -37,13 +36,11 @@ var createMockKnexQuery = function (client, queryType, data) {
 			]}
 		],
 		then: function (callback) {
-			var deferred = when.defer();
-			
-			process.nextTick(function () {
-				deferred.resolve(callback(data));
+			return new Promise(function (resolve) {
+				process.nextTick(function () {
+					resolve(callback(data));
+				});
 			});
-			
-			return deferred.promise;
 		},
 		catch: function (callback) {
 		}
@@ -164,7 +161,7 @@ describe('KnexNest', function () {
 			listOnEmpty: true,
 			it: 'should throw error',
 			expectResult: null,
-			expectError: 'listOnEmpty param conflicts with query which specifies a object or null result'
+			expectError: 'listOnEmpty param conflicts with query which specifies an object or null result'
 		},
 		{
 			describe: 'object query with empty result and no listOnEmpty hint for non-postgres connection',

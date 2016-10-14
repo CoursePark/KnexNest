@@ -1,6 +1,6 @@
 {
   "name": "knexnest",
-  "version": "0.3.4",
+  "version": "0.4.0",
   "description": "Given a Knex select object will provide a hyrdated object using promises.",
   "keywords": [
     "Hydration",
@@ -14,7 +14,7 @@
     "Postgres",
     "SQLite"
   ],
-  "license": "Talk to the Legal Department",
+  "license": "MIT",
   "main": "knexnest.js",
   "scripts": {
     "coverage": "node_modules/istanbul/lib/cli.js cover node_modules/jasmine/bin/jasmine.js",
@@ -25,16 +25,19 @@
     "type": "git",
     "url": "git@github.com:CoursePark/KnexNest.git"
   },
+  "engine": {
+    "node": ">=0.12"
+  },
   "dependencies": {
     "knex": "0.8.6",
-    "nesthydrationjs": "0.2.9",
-    "when": "3.7.3"
+    "nesthydrationjs": "0.3.0"
   },
   "devDependencies": {
     "coveralls": "2.11.3",
     "istanbul": "0.3.17",
     "jasmine": "2.3.1",
-    "lodash": "3.10.0"
+    "lodash": "3.10.0",
+    "pg": "6.1.0"
   },
   "author": "Bluedrop Peformance Learning"
 }

@@ -8,7 +8,7 @@ var knexnest = function (knexQuery, listOnEmpty) {
 	// NestHydration this just indicates if empty should be object or array
 	var structPropToColumnMap = null;
 	
-	if (knexQuery.client.config && knexQuery.client.config.client === 'postgres' || knexQuery.client.Raw.name === 'Raw_PG') {
+	if (knexQuery.client.config ? knexQuery.client.config.client === 'postgres' : knexQuery.client.Raw.name === 'Raw_PG') {
 		// Postgres limit column name lengths to 63 characters, need to work
 		// around that.
 		// Knex also doesn't provide get or set mechanisms for the column

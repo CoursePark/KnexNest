@@ -1,6 +1,5 @@
 'use strict';
 
-var _ = require('lodash');
 var knexnest = require('../knexnest.js');
 
 var createMockKnexQuery = function (client, queryType, data) {
@@ -42,7 +41,7 @@ var createMockKnexQuery = function (client, queryType, data) {
 				});
 			});
 		},
-		catch: function (callback) {
+		catch: function () {
 		}
 	};
 };
@@ -181,7 +180,8 @@ describe('KnexNest', function () {
 		}
 	];
 	
-	_.each(scenarioList, function (scenario) {
+	for (var i = 0; i < scenarioList.length; i++) {
+		var scenario = scenarioList[i];
 		describe(scenario.describe, function () {
 			beforeEach(function (done) {
 				result = error = undefined;
@@ -206,5 +206,5 @@ describe('KnexNest', function () {
 				}
 			});
 		});
-	});
+	}
 });

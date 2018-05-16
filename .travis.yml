@@ -1,6 +1,16 @@
 language: node_js
+branches:
+    only:
+        - master
+        - qc
 node_js:
     - "0.12.5"
+    - "4"
+    - "6"
+    - "8"
+    - "node"
 script:
     - npm test
+after_script:
+    - npm run coverage
     - npm run coveralls

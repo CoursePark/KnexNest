@@ -1,6 +1,6 @@
 'use strict';
 
-var NestHydrationJS = require('nesthydrationjs');
+var NestHydrationJS = require('nesthydrationjs')();
 
 /* expects a knex object and returns a promise */
 var knexnest = function (knexQuery, listOnEmpty) {

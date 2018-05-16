@@ -124,11 +124,11 @@ knex.raw(testData)
 		}
 	})
 	.then(function () {
-		console.log('Success');
+		process.stdout.write('Success\n');
 	})
 	// ERROR OUTPUT AND CLEAN UP
 	.catch(function (error) {
-		console.error(error);
+		console.error(error); // eslint-disable-line no-console
 	})
 	.then(function () {
 		knex.destroy();

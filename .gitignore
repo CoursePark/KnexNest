@@ -1,3 +1,14 @@
-coverage
-node_modules
-npm-debug.log
+*
+
+!/spec
+!/spec/**
+!/test
+!/test/**
+!/.coveralls.yml
+!/.editorconfig
+!/.eslintrc
+!/.travis.yml
+!/knexnest.js
+!/package-lock.json
+!/package.json
+!/README.md

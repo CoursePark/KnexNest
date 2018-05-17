@@ -9,8 +9,12 @@ node_js:
     - "6"
     - "8"
     - "node"
+services:
+    - postgresql
+before_script:
+    - psql -c 'CREATE DATABASE knexnest_test;' -U postgres
 script:
     - npm test
 after_script:
-    - npm run coverage
+    - DATABASE_URL=postgres://postgres@localhost:5432/knexnest_test npm run coverage:travis
     - npm run coveralls

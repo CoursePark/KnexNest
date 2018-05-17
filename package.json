@@ -18,8 +18,10 @@
   "main": "knexnest.js",
   "scripts": {
     "coverage": "nyc jasmine",
+    "coverage:travis": "nyc npm run test:travis",
     "coveralls": "nyc report --reporter=text-lcov | coveralls",
     "test": "jasmine",
+    "test:travis": "jasmine && node test/postgres.js",
     "lint": "eslint knexnest.js spec/**/*.js"
   },
   "repository": {

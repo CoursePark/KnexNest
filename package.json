@@ -32,14 +32,14 @@
     "node": ">=0.12"
   },
   "dependencies": {
-    "knex": "^0.14.6",
-    "nesthydrationjs": "^1.0.5"
+    "knex": "^0.95.4",
+    "nesthydrationjs": "^2.0.0"
   },
   "devDependencies": {
-    "coveralls": "^3.0.1",
+    "coveralls": "^3.1.0",
     "eslint": "^4.19.1",
     "jasmine": "^3.1.0",
-    "nyc": "^11.7.3",
+    "nyc": "^15.1.0",
     "pg": "^7.4.3"
   },
   "author": "Bluedrop Peformance Learning"
